@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Orrery</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            color: #fff;
+            margin: 0;
+            overflow: hidden; /* Prevents scrolling */
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.7;
+            animation: twinkle 1.5s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+        }
+        #sun {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255, 204, 0, 1) 0%, rgba(255, 85, 0, 1) 60%);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.5), 0 0 60px rgba(255, 85, 0, 0.7);
+        }
+        .orbit {
+            position: absolute;
+            border: 1px solid #fff;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div id="sun" class="planet"></div>
+    <div id="mercury-orbit" class="orbit" style="width: 100px; height: 100px;"></div>
+    <div id="mercury" class="planet" style="width: 10px; height: 10px; background-color: gray;"></div>
+    <div id="venus-orbit" class="orbit" style="width: 150px; height: 150px;"></div>
+    <div id="venus" class="planet" style="width: 15px; height: 15px; background-color: orange;"></div>
+    <div id="earth-orbit" class="orbit" style="width: 200px; height: 200px;"></div>
+    <div id="earth" class="planet" style="width: 20px; height: 20px; background-color: blue;"></div>
+    <div id="mars-orbit" class="orbit" style="width: 250px; height: 250px;"></div>
+    <div id="mars" class="planet" style="width: 15px; height: 15px; background-color: red;"></div>
+    <div id="jupiter-orbit" class="orbit" style="width: 300px; height: 300px;"></div>
+    <div id="jupiter" class="planet" style="width: 30px; height: 30px; background-color: brown;"></div>
+    <div id="saturn-orbit" class="orbit" style="width: 350px; height: 350px;"></div>
+    <div id="saturn" class="planet" style="width: 25px; height: 25px; background-color: yellow;"></div>
+    <div id="uranus-orbit" class="orbit" style="width: 400px; height: 400px;"></div>
+    <div id="uranus" class="planet" style="width: 20px; height: 20px; background-color: lightblue;"></div>
+    <div id="neptune-orbit" class="orbit" style="width: 450px; height: 450px;"></div>
+    <div id="neptune" class="planet" style="width: 20px; height: 20px; background-color: darkblue;"></div>
+
+    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+        <button id="playButton">Play</button>
+        <button id="stopButton">Stop</button>
+    </div>
+
+    <script>
+        const planets = [
+            { id: 'mercury', orbit: 50, speed: 0.02 },
+            { id: 'venus', orbit: 75, speed: 0.015 },
+            { id: 'earth', orbit: 100, speed: 0.01 },
+            { id: 'mars', orbit: 125, speed: 0.008 },
+            { id: 'jupiter', orbit: 150, speed: 0.005 },
+            { id: 'saturn', orbit: 175, speed: 0.004 },
+            { id: 'uranus', orbit: 200, speed: 0.003 },
+            { id: 'neptune', orbit: 225, speed: 0.002 }
+        ];
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        let animationId; 
+        let isAnimating = true; 
+
+        function animate() {
+            if (!isAnimating) return;
+
+            planets.forEach(planet => {
+                const planetElement = document.getElementById(planet.id);
+                planet.angle = (planet.angle || 0) + planet.speed;
+                const x = centerX + planet.orbit * Math.cos(planet.angle) - planetElement.offsetWidth / 2;
+                const y = centerY + planet.orbit * Math.sin(planet.angle) - planetElement.offsetHeight / 2;
+                planetElement.style.left = `${x}px`;
+                planetElement.style.top = `${y}px`;
+            });
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        document.getElementById('sun').style.left = `${centerX - 25}px`;
+        document.getElementById('sun').style.top = `${centerY - 25}px`;
+
+        planets.forEach(planet => {
+            const planetElement = document.getElementById(planet.id);
+            const orbitElement = document.getElementById(`${planet.id}-orbit`);
+            orbitElement.style.left = `${centerX - planet.orbit}px`;
+            orbitElement.style.top = `${centerY - planet.orbit}px`;
+        });
+
+        animate();
+
+        document.getElementById('playButton').addEventListener('click', () => {
+            isAnimating = true; 
+            animate(); 
+        });
+
+        document.getElementById('stopButton').addEventListener('click', () => {
+            isAnimating = false; 
+            cancelAnimationFrame(animationId); 
+        });
+
+        function createStars(numStars) {
+            const body = document.body;
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1; // Random size between 1px and 4px
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * window.innerWidth}px`;
+                star.style.top = `${Math.random() * window.innerHeight}px`;
+                star.style.animationDuration = `${Math.random() * 1 + 0.5}s`; // Random twinkle speed
+                body.appendChild(star);
+            }
+        }
+
+        // Create 100 stars
+        createStars(100);
+    </script>
+</body>
+</html>
